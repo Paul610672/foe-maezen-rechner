@@ -1,0 +1,17 @@
+{
+  "name": "FoE Mäzen-Rechner",
+  "short_name": "Mäzen-Rechner",
+  "description": "Persönlicher Forge of Empires Mäzen-Rechner",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#111318",
+  "theme_color": "#17191e",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
