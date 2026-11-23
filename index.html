@@ -1,238 +1,67 @@
 <!doctype html>
-<html lang="de">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#17191e">
-  <meta name="description" content="Persönlicher Forge of Empires Mäzen-Rechner">
-  <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="icon.svg" type="image/svg+xml">
-  <title>FoE Mäzen-Rechner</title>
-  <style>
-    :root {
-      color-scheme: dark;
-      --bg: #111318; --panel: #1b1e25; --panel2: #222630;
-      --gold: #d9ad55; --gold2: #f0cf83; --text: #f4f1e9;
-      --muted: #a7a9b0; --line: #343945; --green: #8fd0a3;
-      --danger: #f09a8d;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0; min-height: 100vh; padding: 24px 14px 40px;
-      background: radial-gradient(ellipse at top, #29251d 0, var(--bg) 48%);
-      color: var(--text); font: 16px/1.45 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-    main { width: min(100%, 620px); margin: 0 auto; }
-    header { text-align: center; margin: 10px 0 24px; }
-    .emblem {
-      display: inline-grid; place-items: center; width: 54px; height: 54px;
-      border: 1px solid #80652f; border-radius: 16px; color: var(--gold2);
-      background: linear-gradient(145deg, #393020, #1b1e25); font-size: 27px;
-      box-shadow: 0 8px 30px #0006;
-    }
-    h1 { margin: 12px 0 3px; color: var(--gold2); font-size: clamp(25px, 6vw, 32px); letter-spacing: .2px; }
-    .subtitle { color: var(--muted); font-size: 13px; }
-    section {
-      background: linear-gradient(180deg, #20232b, var(--panel));
-      border: 1px solid var(--line); border-radius: 18px; padding: 18px;
-      margin: 14px 0; box-shadow: 0 12px 30px #0003;
-    }
-    h2 { margin: 0 0 15px; color: var(--gold); font-size: 16px; letter-spacing: .3px; }
-    .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 13px 12px; }
-    .field { min-width: 0; }
-    .field.wide { grid-column: 1 / -1; }
-    label { display: block; margin: 0 0 6px; color: #d5d2ca; font-size: 13px; }
-    input {
-      width: 100%; min-height: 47px; padding: 11px 12px;
-      color: var(--text); background: #12151b; border: 1px solid #414754;
-      border-radius: 10px; font: inherit; outline: none;
-    }
-    input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px #d9ad5522; }
-    input::placeholder { color: #737985; }
-    .results { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .result {
-      padding: 14px; background: #14171d; border: 1px solid #393e49; border-radius: 13px;
-    }
-    .result span { display: block; color: var(--muted); font-size: 12px; min-height: 34px; }
-    .result strong { display: block; margin-top: 5px; color: var(--gold2); font-size: clamp(22px, 5vw, 29px); line-height: 1.15; }
-    .result.self strong { color: var(--green); }
-    .unit { color: var(--muted); font-size: 12px; }
-    .warning { margin: 12px 0 0; color: var(--danger); font-size: 13px; }
-    .chat {
-      padding: 14px; border-radius: 12px; background: #12151b;
-      border: 1px dashed #756039; color: var(--text); overflow-wrap: anywhere;
-      min-height: 48px; font-weight: 600;
-    }
-    button {
-      width: 100%; min-height: 48px; margin-top: 12px; border: 0; border-radius: 11px;
-      background: linear-gradient(135deg, #e5c477, #bd8d39); color: #211b10;
-      font: 700 15px system-ui; cursor: pointer;
-    }
-    button:active { transform: translateY(1px); }
-    button:disabled { opacity: .4; cursor: not-allowed; }
-    .secondary {
-      background: #292e38; color: #e8e4da; border: 1px solid #464d5a;
-    }
-    .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .actions button { font-size: 13px; }
-    .note { text-align: center; color: var(--muted); font-size: 12px; margin: 18px 8px; }
-    @media (max-width: 430px) {
-      body { padding: 16px 11px 30px; }
-      section { padding: 15px; }
-      .fields { grid-template-columns: 1fr; }
-      .field.wide { grid-column: auto; }
-      .results { grid-template-columns: 1fr 1fr; }
-    }
-  </style>
-</head>
-<body>
-<main>
-  <header>
-    <div class="emblem" aria-hidden="true">⚔</div>
-    <h1>FoE Mäzen-Rechner</h1>
-    <div class="subtitle">Mein persönlicher FP-Rechner</div>
-  </header>
-
-  <section>
-    <h2>EINGABEN</h2>
-    <div class="fields">
-      <div class="field wide">
-        <label for="player">Spielername</label>
-        <input id="player" autocomplete="nickname" placeholder="Dein Spielername">
-      </div>
-      <div class="field wide">
-        <label for="building">LG-Name</label>
-        <input id="building" placeholder="z. B. Alcatraz">
-      </div>
-      <div class="field">
-        <label for="factor">Förderfaktor</label>
-        <input id="factor" inputmode="decimal" placeholder="z. B. 1,9">
-      </div>
-      <div class="field">
-        <label for="level">Stufe</label>
-        <input id="level" inputmode="numeric" placeholder="z. B. 80">
-      </div>
-      <div class="field">
-        <label for="total">Gesamt-FP</label>
-        <input id="total" inputmode="numeric" placeholder="z. B. 5000">
-      </div>
-      <div class="field">
-        <label for="slot">Mäzen-Platz</label>
-        <input id="slot" inputmode="numeric" placeholder="z. B. 1">
-      </div>
-      <div class="field wide">
-        <label for="reward">Belohnung</label>
-        <input id="reward" inputmode="numeric" placeholder="z. B. 250">
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <h2>BERECHNUNG</h2>
-    <div class="results">
-      <div class="result">
-        <span>Kosten des Mäzen-Platzes</span>
-        <strong id="cost">–</strong>
-        <div class="unit">FP</div>
-      </div>
-      <div class="result self">
-        <span>Selbst einzahlen bis</span>
-        <strong id="self">–</strong>
-        <div class="unit">FP</div>
-      </div>
-    </div>
-    <p id="warning" class="warning" hidden></p>
-  </section>
-
-  <section>
-    <h2>TEXT FÜR DEN GILDENCHAT</h2>
-    <div class="chat" id="chat" aria-live="polite">Hier erscheint dein fertiger Angebotstext.</div>
-    <button id="copy" disabled>Text kopieren</button>
-  </section>
-
-  <div class="actions">
-    <button class="secondary" id="clear">Eingaben leeren</button>
-    <button class="secondary" id="reset">Alles zurücksetzen</button>
-  </div>
-  <p class="note">Deine Eingaben werden automatisch nur in diesem Browser auf diesem Gerät gespeichert.</p>
-</main>
-<script>
-(() => {
-  const ids = ["player", "building", "factor", "level", "total", "slot", "reward"];
-  const $ = id => document.getElementById(id);
-  const storageKey = "foe-maezen-rechner-v1";
-  const numeric = id => {
-    const raw = $(id).value.trim().replace(",", ".");
-    return raw === "" ? NaN : Number(raw);
-  };
-  const fmt = n => Math.round(n).toLocaleString("de-DE");
-
-  function save() {
-    const data = Object.fromEntries(ids.map(id => [id, $(id).value]));
-    try { localStorage.setItem(storageKey, JSON.stringify(data)); } catch (_) {}
-  }
-  function calculate() {
-    const player = $("player").value.trim();
-    const building = $("building").value.trim();
-    const factor = numeric("factor");
-    const level = numeric("level");
-    const total = numeric("total");
-    const slot = numeric("slot");
-    const reward = numeric("reward");
-
-    const valid = player && building &&
-      [factor, level, total, slot, reward].every(Number.isFinite) &&
-      factor > 0 && level >= 0 && total >= 0 && slot >= 1 && reward >= 0;
-
-    $("cost").textContent = valid ? fmt(reward * factor) : "–";
-    const cost = valid ? Math.round(reward * factor) : 0;
-    const self = valid ? total - 2 * cost : 0;
-    $("self").textContent = valid ? fmt(self) : "–";
-
-    const warning = $("warning");
-    warning.hidden = !(valid && self < 0);
-    warning.textContent = "Achtung: Die Gesamt-FP reichen nicht aus, um den Mäzen-Platz nach dieser Formel abzusichern.";
-
-    const chat = valid ? `${player} ${building} ${fmt(level)}: P${fmt(slot)} (${fmt(cost)})` : "";
-    $("chat").textContent = chat || "Hier erscheint dein fertiger Angebotstext.";
-    $("copy").disabled = !valid;
-    $("copy").dataset.text = chat;
-  }
-  function restore() {
-    try {
-      const data = JSON.parse(localStorage.getItem(storageKey) || "{}");
-      ids.forEach(id => { if (typeof data[id] === "string") $(id).value = data[id]; });
-    } catch (_) {}
-    calculate();
-  }
-  ids.forEach(id => $(id).addEventListener("input", () => { save(); calculate(); }));
-  $("copy").addEventListener("click", async () => {
-    const text = $("copy").dataset.text || "";
-    try {
-      await navigator.clipboard.writeText(text);
-      $("copy").textContent = "✓ Kopiert!";
-    } catch (_) {
-      const area = document.createElement("textarea");
-      area.value = text; document.body.appendChild(area); area.select();
-      document.execCommand("copy"); area.remove();
-      $("copy").textContent = "✓ Kopiert!";
-    }
-    setTimeout(() => $("copy").textContent = "Text kopieren", 1600);
-  });
-  $("clear").addEventListener("click", () => {
-    ids.forEach(id => $(id).value = "");
-    save(); calculate();
-  });
-  $("reset").addEventListener("click", () => {
-    ids.forEach(id => $(id).value = "");
-    try { localStorage.removeItem(storageKey); } catch (_) {}
-    calculate();
-  });
-  if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
-    window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
-  }
-  restore();
+<html lang="de"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#17191e"><meta name="description" content="Persönlicher Forge of Empires Mäzen-Rechner">
+<link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>FoE Mäzen-Rechner</title>
+<style>
+:root{color-scheme:dark;--bg:#111318;--panel:#1b1e25;--gold:#d9ad55;--gold2:#f0cf83;--text:#f4f1e9;--muted:#a7a9b0;--line:#343945;--green:#8fd0a3;--danger:#f09a8d}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;padding:24px 14px 40px;background:radial-gradient(ellipse at top,#29251d 0,var(--bg) 48%);color:var(--text);font:16px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{width:min(100%,620px);margin:0 auto}header{text-align:center;margin:10px 0 24px}.emblem{display:inline-grid;place-items:center;width:54px;height:54px;border:1px solid #80652f;border-radius:16px;color:var(--gold2);background:linear-gradient(145deg,#393020,#1b1e25);font-size:27px;box-shadow:0 8px 30px #0006}
+h1{margin:12px 0 3px;color:var(--gold2);font-size:clamp(25px,6vw,32px)}.subtitle{color:var(--muted);font-size:13px}
+section{background:linear-gradient(180deg,#20232b,var(--panel));border:1px solid var(--line);border-radius:18px;padding:18px;margin:14px 0;box-shadow:0 12px 30px #0003}h2{margin:0 0 15px;color:var(--gold);font-size:16px;letter-spacing:.3px}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:13px 12px}.field{min-width:0}.field.wide{grid-column:1/-1}label{display:block;margin:0 0 6px;color:#d5d2ca;font-size:13px}
+input{width:100%;min-height:47px;padding:11px 12px;color:var(--text);background:#12151b;border:1px solid #414754;border-radius:10px;font:inherit;outline:none}input:focus{border-color:var(--gold);box-shadow:0 0 0 3px #d9ad5522}input::placeholder{color:#737985}
+.results{display:grid;grid-template-columns:1fr 1fr;gap:10px}.result{padding:14px;background:#14171d;border:1px solid #393e49;border-radius:13px}.result span{display:block;color:var(--muted);font-size:12px;min-height:34px}.result strong{display:block;margin-top:5px;color:var(--gold2);font-size:clamp(22px,5vw,29px);line-height:1.15}.result.self strong{color:var(--green)}.unit{color:var(--muted);font-size:12px}.warning{margin:12px 0 0;color:var(--danger);font-size:13px}
+.chat{padding:14px;border-radius:12px;background:#12151b;border:1px dashed #756039;color:var(--text);overflow-wrap:anywhere;min-height:48px;font-weight:600}
+button{width:100%;min-height:48px;margin-top:12px;border:0;border-radius:11px;background:linear-gradient(135deg,#e5c477,#bd8d39);color:#211b10;font:700 15px system-ui;cursor:pointer}button:active{transform:translateY(1px)}button:disabled{opacity:.4;cursor:not-allowed}.secondary{background:#292e38;color:#e8e4da;border:1px solid #464d5a}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}.actions button{font-size:13px}.note{text-align:center;color:var(--muted);font-size:12px;margin:18px 8px}
+@media(max-width:430px){body{padding:16px 11px 30px}section{padding:15px}.fields{grid-template-columns:1fr}.field.wide{grid-column:auto}}
+</style></head><body><main>
+<header><div class="emblem" aria-hidden="true">⚔</div><h1>FoE Mäzen-Rechner</h1><div class="subtitle">Mein persönlicher FP-Rechner</div></header>
+<section><h2>EINGABEN</h2><div class="fields">
+<div class="field wide"><label for="player">Spielername</label><input id="player" autocomplete="nickname" placeholder="Dein Spielername"></div>
+<div class="field"><label for="factor">Förderfaktor</label><input id="factor" inputmode="decimal" placeholder="z. B. 1,9"></div>
+<div class="field"><label for="building">LG-Name</label><input id="building" placeholder="z. B. Alcatraz"></div>
+<div class="field"><label for="level">Stufe</label><input id="level" inputmode="numeric" placeholder="z. B. 80"></div>
+<div class="field"><label for="total">Gesamt-FP</label><input id="total" inputmode="numeric" placeholder="z. B. 5000"></div>
+<div class="field"><label for="slot">Mäzen-Platz</label><input id="slot" inputmode="numeric" placeholder="z. B. 1"></div>
+<div class="field wide"><label for="reward">Belohnung</label><input id="reward" inputmode="numeric" placeholder="z. B. 250"></div>
+</div></section>
+<section><h2>BERECHNUNG</h2><div class="results">
+<div class="result"><span>Kosten des Mäzen-Platzes</span><strong id="cost">–</strong><div class="unit">FP</div></div>
+<div class="result self"><span>Selbst einzahlen bis</span><strong id="self">–</strong><div class="unit">FP</div></div>
+</div><p id="warning" class="warning" hidden></p></section>
+<section><h2>TEXT FÜR DEN GILDENCHAT</h2><div class="chat" id="chat" aria-live="polite">Hier erscheint dein fertiger Angebotstext.</div><button id="copy" disabled>Text kopieren</button></section>
+<div class="actions">
+<button class="secondary" id="clear">Eingaben leeren</button>
+<button class="secondary" id="nextLevel">Nächste LG-Stufe</button>
+<button class="secondary" id="nextSlot">Nächster Mäzen-Platz</button>
+<button class="secondary" id="reset">Alles zurücksetzen</button>
+</div>
+<p class="note">Deine Eingaben werden automatisch nur in diesem Browser auf diesem Gerät gespeichert.</p>
+</main><script>
+(()=>{
+const ids=["player","building","factor","level","total","slot","reward"],$=id=>document.getElementById(id),storageKey="foe-maezen-rechner-v1";
+const numeric=id=>{const raw=$(id).value.trim().replace(",",".");return raw===""?NaN:Number(raw)},fmt=n=>Math.round(n).toLocaleString("de-DE");
+function save(){const data=Object.fromEntries(ids.map(id=>[id,$(id).value]));try{localStorage.setItem(storageKey,JSON.stringify(data))}catch(_){}}
+function calculate(){
+const player=$("player").value.trim(),building=$("building").value.trim(),factor=numeric("factor"),level=numeric("level"),total=numeric("total"),slot=numeric("slot"),reward=numeric("reward");
+const valid=!!player&&!!building&&[factor,level,total,slot,reward].every(Number.isFinite)&&factor>0&&level>=0&&total>=0&&slot>=1&&reward>=0;
+const cost=valid?Math.round(reward*factor):0,self=valid?total-2*cost:0;
+$("cost").textContent=valid?fmt(cost):"–";$("self").textContent=valid?fmt(self):"–";
+$("warning").hidden=!(valid&&self<0);$("warning").textContent="Achtung: Die Gesamt-FP reichen nicht aus, um den Mäzen-Platz nach dieser Formel abzusichern.";
+const chat=valid?`${player} ${building} ${fmt(level)}: P${fmt(slot)} (${fmt(cost)})`:"";
+$("chat").textContent=chat||"Hier erscheint dein fertiger Angebotstext.";$("copy").disabled=!valid;$("copy").dataset.text=chat;
+}
+function restore(){try{const data=JSON.parse(localStorage.getItem(storageKey)||"{}");ids.forEach(id=>{if(typeof data[id]==="string")$(id).value=data[id]})}catch(_){}calculate()}
+ids.forEach(id=>$(id).addEventListener("input",()=>{save();calculate()}));
+$("copy").addEventListener("click",async()=>{const text=$("copy").dataset.text||"";try{await navigator.clipboard.writeText(text)}catch(_){const a=document.createElement("textarea");a.value=text;document.body.appendChild(a);a.select();document.execCommand("copy");a.remove()}$("copy").textContent="✓ Kopiert!";setTimeout(()=>$("copy").textContent="Text kopieren",1600)});
+$("clear").addEventListener("click",()=>{["building","level","total","slot","reward"].forEach(id=>$(id).value="");save();calculate()});
+$("nextLevel").addEventListener("click",()=>{const n=numeric("level");$("level").value=Number.isFinite(n)?String(Math.floor(n)+1):"1";$("slot").value="1";$("total").value="";$("reward").value="";save();calculate()});
+$("nextSlot").addEventListener("click",()=>{const n=numeric("slot");$("slot").value=Number.isFinite(n)?String(Math.floor(n)+1):"1";$("reward").value="";save();calculate()});
+$("reset").addEventListener("click",()=>{ids.forEach(id=>$(id).value="");try{localStorage.removeItem(storageKey)}catch(_){}calculate()});
+if("serviceWorker"in navigator&&location.protocol.startsWith("http"))window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+restore();
 })();
-</script>
-</body>
-</html>
+</script></body></html>
